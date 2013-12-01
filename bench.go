@@ -6,7 +6,6 @@ import (
     "sync"
     "fmt"
     "time"
-    "io/ioutil"
     "flag"
     "os"
 )
@@ -26,8 +25,7 @@ func get(nb int, url string){
     if err != nil {
       fmt.Printf("%s", err)
     } else {
-      defer response.Body.Close()
-      ioutil.ReadAll(response.Body)
+      response.Body.Close()
     }
   }
   wg.Done()
