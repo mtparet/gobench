@@ -13,7 +13,14 @@ import (
 
 var wg sync.WaitGroup
 
-func get(nb int, url string,client *http.Client){
+func get(nb int, url string){
+  tr := &http.Transport{
+    DisableKeepAlives:  true,
+    DisableCompression: true,
+  }
+
+  client := &http.Client{Transport: tr}
+
   for c := 0; c < nb; c++ {
 	  response, err := client.Get(url)
     if err != nil {
@@ -57,16 +64,8 @@ func main() {
 
     fmt.Println("Starting");
 
-    tr := &http.Transport{
-	    DisableKeepAlives:  true,
-      ResponseHeaderTimeout: time.Second,
-	    DisableCompression: true,
-    }
-
-    client := &http.Client{Transport: tr}
-
     for c := 0; c < *concurrencyPtr; c++ {
-	    go get(numberRequestGoRun, url, client)
+	    go get(numberRequestGoRun, url)
     }
 
     fmt.Println("Performing");
