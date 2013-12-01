@@ -13,21 +13,15 @@ import (
 
 var wg sync.WaitGroup
 
-func req(url string){
-  response, err := http.Get(url)
-  if err != nil {
-      fmt.Printf("%s", err)
-  } else {
-    defer response.Body.Close()
-    _, err := ioutil.ReadAll(response.Body)
-    if err != nil {
-    }
-  }
-}
-
-func getget(nb int, url string){
+func get(nb int, url string,client *http.Client){
   for c := 0; c < nb; c++ {
-	  req(url)
+	  response, err := client.Get(url)
+    if err != nil {
+      fmt.Printf("%s", err)
+    } else {
+      defer response.Body.Close()
+      ioutil.ReadAll(response.Body)
+    }
   }
   wg.Done()
 }
@@ -63,8 +57,16 @@ func main() {
 
     fmt.Println("Starting");
 
+    tr := &http.Transport{
+	    DisableKeepAlives:  true,
+      ResponseHeaderTimeout: time.Second,
+	    DisableCompression: true,
+    }
+
+    client := &http.Client{Transport: tr}
+
     for c := 0; c < *concurrencyPtr; c++ {
-	    go getget(numberRequestGoRun, url)
+	    go get(numberRequestGoRun, url, client)
     }
 
     fmt.Println("Performing");
